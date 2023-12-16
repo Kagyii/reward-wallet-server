@@ -5,23 +5,18 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { Observable, map } from 'rxjs';
-
-export interface Response<T> {
-  statusCode: string;
-  message: string;
-  data: T;
-  meta: T;
-}
+import { IResponse } from 'src/interfaces/response.interface';
+import { randomUUID } from 'node:crypto';
 
 @Injectable()
-export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
+export class RequestResponseInterceptor implements NestInterceptor {
   intercept(
     context: ExecutionContext,
     next: CallHandler,
-  ): Observable<Response<T>> {
+  ): Observable<IResponse> {
+    context.switchToHttp().getRequest().headers['X-Request-Id'] = randomUUID();
     return next.handle().pipe(
       map((data) => ({
-        statusCode: context.switchToHttp().getResponse().statusCode,
         message: data.message,
         data: data.data,
         meta: data?.meta ?? {},

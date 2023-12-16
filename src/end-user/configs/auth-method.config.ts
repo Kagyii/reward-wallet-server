@@ -1,0 +1,5 @@
+export const AUTHENTICATE_METHODS = {
+  PHONE: 'PHONE',
+  FACEBOOK: 'FACEBOOK',
+  GOOGLE: 'GOOGLE',
+} as const;
