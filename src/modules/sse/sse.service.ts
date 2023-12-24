@@ -1,5 +1,10 @@
 import { SSE_STATUS } from '@/config/sse-status.config';
-import { GoneException, Injectable, MessageEvent } from '@nestjs/common';
+import {
+  GoneException,
+  Injectable,
+  MessageEvent,
+  OnModuleInit,
+} from '@nestjs/common';
 import { toBuffer } from 'qrcode';
 import {
   BehaviorSubject,
@@ -14,12 +19,14 @@ import {
 import { UtilityService } from '../utility/utility.service';
 
 @Injectable()
-export class SseService {
+export class SseService implements OnModuleInit {
   private readonly exp = 60;
 
-  private readonly clients: Map<string, BehaviorSubject<MessageEvent>>;
+  private clients: Map<string, BehaviorSubject<MessageEvent>>;
 
-  constructor(private utilityService: UtilityService) {
+  constructor(private utilityService: UtilityService) {}
+
+  onModuleInit() {
     this.clients = new Map();
   }
 

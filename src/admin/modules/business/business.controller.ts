@@ -2,7 +2,6 @@ import { IResponse } from '@/interfaces/response.interface';
 import { Body, Controller, Post, UseInterceptors } from '@nestjs/common';
 import { CreateBusinessDto } from './dtos/create-business.dto';
 import { BusinessService } from './business.service';
-import { StorageService } from '@/modules/storage/storage.service';
 import { generate as generatePassword } from 'generate-password';
 import {
   FileInterceptor,
@@ -12,10 +11,7 @@ import {
 
 @Controller('admin/business')
 export class BusinessController {
-  constructor(
-    private readonly businessService: BusinessService,
-    private readonly storageService: StorageService,
-  ) {}
+  constructor(private readonly businessService: BusinessService) {}
 
   @Post()
   @UseInterceptors(FileInterceptor('logo'))
@@ -50,7 +46,7 @@ export class BusinessController {
         name: business.name,
         email: business.email,
         phone: business.phone,
-        logo: await this.storageService.getUrl(business.logo),
+        logo: business.logo,
       },
     };
   }

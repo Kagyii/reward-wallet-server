@@ -19,6 +19,7 @@ import { UtilityModule } from './modules/utility/utility.module';
 import { UtilityService } from './modules/utility/utility.service';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { SseModule } from './modules/sse/sse.module';
+import { FirebaseModule } from './modules/firebase/firebase.module';
 
 const NODE_ENV = process.env.NODE_ENV;
 
@@ -88,6 +89,7 @@ const NODE_ENV = process.env.NODE_ENV;
     AdminModule,
     UtilityModule,
     SseModule,
+    FirebaseModule,
   ],
   providers: [
     Logger,
