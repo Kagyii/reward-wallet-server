@@ -24,12 +24,11 @@ export class AllExceptionsFilter extends BaseExceptionFilter {
         });
       }
     }
+    log(exception);
 
     if (!(exception instanceof HttpException)) {
       exception = new InternalServerErrorException('Something wrong');
     }
-
-    log(exception);
 
     super.catch(exception, host);
   }
