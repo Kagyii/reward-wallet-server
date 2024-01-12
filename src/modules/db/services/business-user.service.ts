@@ -33,6 +33,27 @@ export class BusinessUserService {
     return query;
   }
 
+  async findMany(
+    filter: Record<string, any> = {},
+    lastCreatedAt?: Date,
+  ): Promise<BusinessUser[]> {
+    const queryFilter = {};
+
+    if (lastCreatedAt) {
+      queryFilter['createdAt'] = { $lt: new Date(lastCreatedAt) };
+    }
+
+    if (filter.name) {
+      queryFilter['name'] = { $regex: filter.name, $options: 'i' };
+    }
+
+    return this.businessUserModel
+      .find(queryFilter)
+      .limit(10)
+      .sort({ createdAt: -1 })
+      .lean();
+  }
+
   async updateById(
     id: string,
     data: Record<string, any>,

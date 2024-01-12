@@ -1,5 +1,14 @@
 import { IResponse } from '@/interfaces/response.interface';
-import { Body, Controller, Post, Put, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { RewardService } from './reward.service';
 import { CreateRewardDto } from './dtos/create-reward.dto';
 import { OwnerGuard } from '@/business/guards/owner.guard';
@@ -10,6 +19,18 @@ import { Business } from '@/modules/db/schemas/business.schema';
 @UseGuards(OwnerGuard)
 export class RewardController {
   constructor(private rewardService: RewardService) {}
+
+  @Get()
+  async list(@Query() query: Record<string, any>): Promise<IResponse> {
+    const rewards = await this.rewardService.getList(
+      query,
+      query?.lastCreatedAt,
+    );
+    return {
+      message: 'Successfully retrieved',
+      data: rewards,
+    };
+  }
 
   @Post()
   async create(
@@ -26,7 +47,16 @@ export class RewardController {
     };
   }
 
-  @Put()
+  @Get(':id')
+  async show(@Param('id') id: string): Promise<IResponse> {
+    const reward = await this.rewardService.getOne(id);
+    return {
+      message: 'Successfully retrieved',
+      data: reward,
+    };
+  }
+
+  @Put(':id')
   async update(): Promise<IResponse> {
     return {
       message: '',

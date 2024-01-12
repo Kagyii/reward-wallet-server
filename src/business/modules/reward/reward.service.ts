@@ -27,4 +27,15 @@ export class RewardService {
       ...(createRewardDto.endDate && { endDate: createRewardDto.endDate }),
     });
   }
+
+  async getList(
+    query: Record<string, any>,
+    lastCreatedAt: Date,
+  ): Promise<Reward[]> {
+    return this.dbRewardService.findMany(query, lastCreatedAt);
+  }
+
+  async getOne(rewardId: string): Promise<Reward> {
+    return this.dbRewardService.findOne({ _id: rewardId });
+  }
 }

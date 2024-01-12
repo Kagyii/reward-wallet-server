@@ -29,4 +29,25 @@ export class RewardService {
 
     return query;
   }
+
+  findMany(
+    filter: Record<string, any> = {},
+    lastCreatedAt?: Date,
+  ): Promise<Reward[]> {
+    const queryFilter = {};
+
+    if (lastCreatedAt) {
+      queryFilter['createdAt'] = { $lt: new Date(lastCreatedAt) };
+    }
+
+    if (filter.title) {
+      queryFilter['title'] = { $regex: filter.title, $options: 'i' };
+    }
+
+    return this.rewardModel
+      .find(queryFilter)
+      .limit(10)
+      .sort({ createdAt: -1 })
+      .lean();
+  }
 }

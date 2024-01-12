@@ -47,10 +47,10 @@ export class Reward {
   @Prop({ type: SchemaTypes.Date })
   endDate: Date;
 
-  @Prop({ type: SchemaTypes.Date, select: false })
+  @Prop({ type: SchemaTypes.Date })
   createdAt: Date;
 
-  @Prop({ type: SchemaTypes.Date, select: false })
+  @Prop({ type: SchemaTypes.Date })
   updatedAt: Date;
 }
 
