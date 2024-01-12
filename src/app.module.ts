@@ -61,8 +61,8 @@ const NODE_ENV = process.env.NODE_ENV;
         port: 587,
         secure: false,
         auth: {
-          user: 'AKIA3ZDOTNA4FGDCMIWP',
-          pass: 'BEKNHNbnUZP2Le/RWfyhnbEAbY3rRP/EMN2NZ+W+y6Ur',
+          user: process.env.AWS_ID,
+          pass: process.env.MAIL_SECRET,
         },
       },
       defaults: {

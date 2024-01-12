@@ -18,8 +18,8 @@ export class StorageService implements OnModuleInit {
     this.s3 = new S3Client({
       region: this.configService.get<string>('STORAGE_REGION'),
       credentials: {
-        accessKeyId: this.configService.get<string>('STORAGE_ID'),
-        secretAccessKey: this.configService.get<string>('STORAGE_SECRET'),
+        accessKeyId: this.configService.get<string>('AWS_ID'),
+        secretAccessKey: this.configService.get<string>('AWS_SECRET'),
       },
     });
 
@@ -50,6 +50,8 @@ export class StorageService implements OnModuleInit {
           ContentDisposition: 'inline',
         }),
       );
+
+      console.log('Successfully Uploaded');
     } catch (error) {
       throw new InternalServerErrorException('File upload fail');
     }
