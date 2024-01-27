@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, SortOrder } from 'mongoose';
 import {
   BUSINESS_USER_SCHEMA_NAME,
   BusinessUser,
@@ -34,23 +34,16 @@ export class BusinessUserService {
   }
 
   async findMany(
-    filter: Record<string, any> = {},
-    lastCreatedAt?: Date,
+    filters: Record<string, any> = {},
+    limit: number = 10,
+    sort: Record<string, SortOrder> = { createdAt: -1 },
+    populates: Array<Record<string, any> & { path: string }> = [],
+    select: Record<string, any> = {},
   ): Promise<BusinessUser[]> {
-    const queryFilter = {};
-
-    if (lastCreatedAt) {
-      queryFilter['createdAt'] = { $lt: new Date(lastCreatedAt) };
-    }
-
-    if (filter.name) {
-      queryFilter['name'] = { $regex: filter.name, $options: 'i' };
-    }
-
     return this.businessUserModel
-      .find(queryFilter)
-      .limit(10)
-      .sort({ createdAt: -1 })
+      .find(this.getFilters(filters))
+      .limit(limit)
+      .sort(sort)
       .lean();
   }
 
@@ -59,5 +52,32 @@ export class BusinessUserService {
     data: Record<string, any>,
   ): Promise<BusinessUser> {
     return this.businessUserModel.findByIdAndUpdate(id, data).exec();
+  }
+
+  private getFilters(filters: Record<string, any>): Record<string, any> {
+    const queryFilter = {};
+
+    // pagination
+    if (filters.page && filters.page != 1) {
+      if (filters.prev) {
+        queryFilter['createdAt'] = { $gt: filters.prev };
+      }
+
+      if (filters.next) {
+        queryFilter['createdAt'] = { $lt: filters.next };
+      }
+    }
+
+    if (filters.name) {
+      queryFilter['name'] = { $regex: filters.name, $options: 'i' };
+    }
+
+    return queryFilter;
+  }
+
+  async count(filters: Record<string, any> = {}): Promise<number> {
+    return this.businessUserModel
+      .countDocuments(this.getFilters(filters))
+      .lean();
   }
 }

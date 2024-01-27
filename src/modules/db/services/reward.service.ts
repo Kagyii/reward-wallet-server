@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { REWARD_SCHEMA_NAME, Reward } from '../schemas/reward.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, SortOrder } from 'mongoose';
 
 @Injectable()
 export class RewardService {
@@ -30,24 +30,42 @@ export class RewardService {
     return query;
   }
 
-  findMany(
-    filter: Record<string, any> = {},
-    lastCreatedAt?: Date,
+  async findMany(
+    filters: Record<string, any> = {},
+    limit: number = 10,
+    sort: Record<string, SortOrder> = { createdAt: -1 },
+    populates: Array<Record<string, any> & { path: string }> = [],
+    select: Record<string, any> = {},
   ): Promise<Reward[]> {
+    return this.rewardModel
+      .find(this.getFilters(filters))
+      .limit(limit)
+      .sort(sort)
+      .lean();
+  }
+
+  async count(filters: Record<string, any> = {}): Promise<number> {
+    return this.rewardModel.countDocuments(this.getFilters(filters)).lean();
+  }
+
+  private getFilters(filters: Record<string, any>): Record<string, any> {
     const queryFilter = {};
 
-    if (lastCreatedAt) {
-      queryFilter['createdAt'] = { $lt: new Date(lastCreatedAt) };
+    // pagination
+    if (filters.page && filters.page != 1) {
+      if (filters.prev) {
+        queryFilter['createdAt'] = { $gt: filters.prev };
+      }
+
+      if (filters.next) {
+        queryFilter['createdAt'] = { $lt: filters.next };
+      }
     }
 
-    if (filter.title) {
-      queryFilter['title'] = { $regex: filter.title, $options: 'i' };
+    if (filters.title) {
+      queryFilter['title'] = { $regex: filters.title, $options: 'i' };
     }
 
-    return this.rewardModel
-      .find(queryFilter)
-      .limit(10)
-      .sort({ createdAt: -1 })
-      .lean();
+    return queryFilter;
   }
 }

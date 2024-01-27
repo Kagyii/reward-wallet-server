@@ -1,6 +1,6 @@
 import { IsAlphanumeric, IsString, Length } from 'class-validator';
 
-export class CreateUserDto {
+export class CreateBusinessUserDto {
   @IsString()
   @Length(1, 20)
   name: string;

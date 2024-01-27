@@ -32,6 +32,7 @@ export class QrController {
 
     obs.subscribe({
       complete: () => {
+        console.log('complete');
         this.sseService.completeRemoveClient(uniqueKey);
       },
     });

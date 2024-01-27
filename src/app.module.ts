@@ -20,6 +20,9 @@ import { UtilityService } from './modules/utility/utility.service';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { SseModule } from './modules/sse/sse.module';
 import { FirebaseModule } from './modules/firebase/firebase.module';
+import mongoose from 'mongoose';
+
+mongoose.set('debug', true);
 
 const NODE_ENV = process.env.NODE_ENV;
 

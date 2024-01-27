@@ -1,4 +1,7 @@
+import { OwnerGuard } from '@/business/guards/owner.guard';
+import { AuthUser } from '@/decorators/auth-user.decorator';
 import { IResponse } from '@/interfaces/response.interface';
+import { Business } from '@/modules/db/schemas/business.schema';
 import {
   Body,
   Controller,
@@ -7,13 +10,13 @@ import {
   Post,
   Put,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
-import { RewardService } from './reward.service';
+import { FastifyRequest } from 'fastify';
 import { CreateRewardDto } from './dtos/create-reward.dto';
-import { OwnerGuard } from '@/business/guards/owner.guard';
-import { AuthUser } from '@/decorators/auth-user.decorator';
-import { Business } from '@/modules/db/schemas/business.schema';
+import { GetRewardsDto } from './dtos/get-rewards.dto';
+import { RewardService } from './reward.service';
 
 @Controller('business/reward')
 @UseGuards(OwnerGuard)
@@ -21,14 +24,24 @@ export class RewardController {
   constructor(private rewardService: RewardService) {}
 
   @Get()
-  async list(@Query() query: Record<string, any>): Promise<IResponse> {
-    const rewards = await this.rewardService.getList(
-      query,
-      query?.lastCreatedAt,
+  async list(
+    @Query() getRewardsDto: GetRewardsDto,
+    @Req() req: FastifyRequest,
+  ): Promise<IResponse> {
+    const paginatedData = await this.rewardService.getPaginatedList(
+      getRewardsDto,
+      req,
     );
+
     return {
       message: 'Successfully retrieved',
-      data: rewards,
+      data: paginatedData.data,
+      meta: {
+        total: paginatedData.total,
+        prev: paginatedData.prev,
+        next: paginatedData.next,
+        final: paginatedData.final,
+      },
     };
   }
 

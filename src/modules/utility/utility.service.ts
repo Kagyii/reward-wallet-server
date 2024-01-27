@@ -8,6 +8,7 @@ import {
   getRandomValues,
   randomUUID,
 } from 'node:crypto';
+import { URL } from 'node:url';
 
 @Injectable()
 export class UtilityService {
@@ -48,5 +49,40 @@ export class UtilityService {
       decipher.update(Buffer.from(data, 'hex')),
       decipher.final(),
     ]).toString('utf-8');
+  }
+
+  createPaginateLink(
+    list: Record<string, any>[],
+    req: FastifyRequest,
+    query: Record<string, any>,
+    final: boolean,
+  ): { prev: string; next: string } {
+    const currentPage = query.page;
+    let nextUrl = null;
+    let prevUrl = null;
+
+    if (currentPage > 1) {
+      prevUrl = new URL(req.url, this.configService.get<string>('APP_URL'));
+      prevUrl.searchParams.set('prev', list[0].createdAt.toISOString());
+      prevUrl.searchParams.set('page', currentPage - 1);
+      prevUrl.searchParams.delete('next');
+      prevUrl = prevUrl.toString();
+    }
+
+    if (!final) {
+      nextUrl = new URL(req.url, this.configService.get<string>('APP_URL'));
+      nextUrl.searchParams.set(
+        'next',
+        list[list.length - 1].createdAt.toISOString(),
+      );
+      nextUrl.searchParams.set('page', currentPage + 1);
+      nextUrl.searchParams.delete('prev');
+      nextUrl = nextUrl.toString();
+    }
+
+    return {
+      prev: prevUrl,
+      next: nextUrl,
+    };
   }
 }
